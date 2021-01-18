@@ -2,7 +2,7 @@
 # import(misc.sh)
 
 get_entries_by_date () {
-  clockify-cli log --format "{{.Description}}${desc_proj_delim}{{.Project.Name}}" --date $1
+  clockify-cli log --format "{{.Description}}${clockify_proj_delim}{{.Project.Name}}" --date $1
 }
 
 get_projects () {
@@ -16,13 +16,13 @@ generate_date_span () {
 }
 
 tracker_start () {
-  biba=$(echo "$1" | sed "s/${desc_proj_delim}/@/")
+  biba=$(echo "$1" | sed "s/${clockify_proj_delim}/@/")
   IFS='@' read -a arr <<< "$biba"
   description="${arr[0]}"
   project_name="${arr[1]}"
   echo "$description :: $project_name"
   project_id=$(grep "^[a-f0-9]\\+ ${project_name}\$" "$projects_file" | cut -f1 -d' ')
-  [[ -z $project_id ]] && notify-send "Unknown clockify project" && exit 1
+  [[ -z $project_id ]] && $notifier "Unknown clockify project" && exit 1
   clockify-cli start "$project_id" "$description"
 }
 
@@ -31,7 +31,7 @@ tracker_stop () {
 }
 
 tracker_format_description () {
-  biba=$(echo "$yoba" | sed "s/${desc_proj_delim}/@/")
+  biba=$(echo "$yoba" | sed "s/${clockify_proj_delim}/@/")
   IFS='@' read -a arr <<< "$biba"
   echo "${arr[0]}"
 }
