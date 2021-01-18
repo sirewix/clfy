@@ -1,0 +1,11 @@
+$progname
+  tracker launcher for integration with dmenu/rofi
+  currently supports only one backend: clockify-cli
+
+usage:
+  $progname sync          -  update local time entries names and projects (call once)
+  $progname start <entry> -  start tracking
+  $progname stop          -  stop tracking
+  $progname start-dmenu   -  start tracking using dmenu
+  $progname status        -  print status for polybar
+  $progname help          -  this help

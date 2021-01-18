@@ -1,0 +1,23 @@
+#!/bin/sh
+
+backend=${1-"clockify-cli"}
+echo Building clfy
+prelude=/tmp/m4-prelude
+m4 --prefix-builtins       \
+   -F $prelude             \
+   prelude.m4
+
+m4 -R $prelude             \
+   -I options              \
+   -I src                  \
+   -D CLF_BACKEND=$backend \
+   src/clfy.sh             \
+   | sed 's/ *$//; /^$/d'  \
+   > clfy
+
+chmod u+x clfy
+
+echo Done
+echo "Use one of these to install clfy:"
+echo "ln -s $PWD/clfy /usr/bin/clfy"
+echo "install $PWD/clfy /usr/bin/clfy"
