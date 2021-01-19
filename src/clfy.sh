@@ -15,7 +15,7 @@ format_status () {
 
 start () {
   [[ -f "$status_file" ]] && tracker_stop
-  tracker_start $1
+  tracker_start "$1"
   $notifier "Start tracking" "$1"
   (date +%s; echo "$1") > "$status_file"
   old_hist="${hist_file}-old"
@@ -31,7 +31,7 @@ stop () {
 
 status () {
   if [ -f "$status_file" ]; then
-    cat "$status_file" | tracker_format_status
+    cat "$status_file" | format_status
   else
     echo ""
   fi
