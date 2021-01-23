@@ -1,0 +1,9 @@
+clockify_proj_delim=' :: '
+cache_dir="${HOME}/.cache/clfy"
+hist_file="${cache_dir}/history"
+projects_file="${cache_dir}/projects"
+status_file="${cache_dir}/status"
+selector="rofi -dmenu -p"
+notifier="notify-send"
+
+mkdir -p "$cache_dir"
