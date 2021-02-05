@@ -2,45 +2,37 @@
 
 # import(options)
 # import(backends/`CLF_BACKEND'.sh)
+# import(status.sh)
 
-format_status () {
-  read -r start_time
-  read -r yoba
-  now=$(date +%s)
-  diff=$((now - start_time))
-  desc=$(tracker_format_description $1)
+stop () {
+  is_it_running && really_stop
+}
 
-  date -u -d "@${diff}" +"${desc} – %H:%M"
+really_stop () {
+  tracker_stop
+  $notifier "Stop tracking" ""
+  total_time_per_day=$(tracker_get_today_total_time)
+  start_time=""
+  description=""
+  write_status
 }
 
 start () {
-  [[ -f "$status_file" ]] && tracker_stop
+  stop
   tracker_start "$1"
   $notifier "Start tracking" "$1"
-  (date +%s; echo "$1") > "$status_file"
+  start_time=$(date +%s)
+  description="$1"
+  write_status
   old_hist="${hist_file}-old"
   cp -f "$hist_file" "$old_hist"
   (echo "$1"; cat "$old_hist") | comb > "$hist_file"
 }
 
-stop () {
-  tracker_stop
-  $notifier "Stop tracking" ""
-  rm "$status_file"
-}
-
-status () {
-  if [ -f "$status_file" ]; then
-    cat "$status_file" | format_status
-  else
-    echo ""
-  fi
-}
-
 sync () {
   n=${1-3}
   tracker_get_entries_last_n_days $n | comb > "$hist_file"
-  $notifier "Tracker history for the last $n days synchronized"
+  $notifier "Tracker history for the last ${n} days synchronized"
 }
 
 print_usage () {
@@ -52,15 +44,15 @@ EOL
 
 start_dmenu () {
   input="$(cat "$hist_file" | $selector "Start tracking")"
-  [[ -z "$input" ]] || start "$input"
+  [ -z "$input" ] || read_status && start "$input"
 }
 
 case $1 in
   sync) sync $2 ;;
-  start) start "$2" ;;
-  stop) stop ;;
+  start) read_status && start "$2" ;;
+  stop) read_status && stop ;;
   start-dmenu) start_dmenu ;;
-  status) status ;;
+  status) read_status && format_status ;;
   help) print_usage ;;
   *) print_usage ;;
 esac

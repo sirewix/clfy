@@ -20,3 +20,7 @@ tracker_get_entries_last_n_days () {
   # takes number of days
   # prints one line for each time entry
 }
+
+tracker_get_today_total_time () {
+  # get total time for today
+}

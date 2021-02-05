@@ -31,7 +31,7 @@ tracker_stop () {
 }
 
 tracker_format_description () {
-  biba=$(echo "$yoba" | sed "s/${clockify_proj_delim}/@/")
+  biba=$(echo "$1" | sed "s/${clockify_proj_delim}/@/")
   IFS='@' read -a arr <<< "$biba"
   echo "${arr[0]}"
 }
@@ -39,4 +39,13 @@ tracker_format_description () {
 tracker_get_entries_last_n_days () {
   get_projects > "$projects_file"
   generate_date_span 0 $1 | to_args get_entries_by_date
+}
+
+tracker_get_today_total_time () {
+  clockify-cli log today --format '{{.TimeInterval.Duration}}' \
+  | sed '
+    s/^PT\([0-9]\+\)S$/00:00:\1/ ;
+    s/^PT\([0-9]\+\)M\([0-9]\+\)S$/00:\1:\2/ ;
+    s/^PT\([0-9]\+\)H\([0-9]\+\)M\([0-9]\+\)S$/\1:\2:\3/' \
+  | sum_dates
 }
