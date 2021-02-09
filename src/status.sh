@@ -1,6 +1,4 @@
-default_status () {
-  echo ; echo ; echo
-}
+default_status () { echo ; echo ; echo ; date -I ; }
 
 format_status () {
   now=$(date +%s)
@@ -26,10 +24,10 @@ format_status () {
 
 read_status () {
   if [ -f "$status_file" ] ; then
-    read_status_to_variables < "$status_file"
+    read_and_update_status < "$status_file"
   else
     default_status > "$status_file"
-    default_status | read_status_to_variables
+    default_status | read_and_update_status
   fi
 }
 
@@ -37,18 +35,26 @@ read_status_to_variables () {
   read -r total_time_per_day
   read -r start_time
   read -r description
+  read -r last_update
 }
 
-write_status () {
-  print_status > "$status_file"
+read_and_update_status () {
+  read_status_to_variables
+  today=$(date -I)
+  if ! [ "$today" = "$last_update" ]; then
+    total_time_per_day=$(tracker_get_today_total_time)
+    last_update="$today"
+    write_status
+  fi
 }
+
+write_status () { print_status > "$status_file" ; }
 
 print_status () {
   echo "$total_time_per_day"
   echo "$start_time"
   echo "$description"
+  echo "$last_update"
 }
 
-is_it_running () {
-  ! [ -z "$start_time" ]
-}
+is_it_running () { ! [ -z "$start_time" ] ; }

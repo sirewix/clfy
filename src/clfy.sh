@@ -44,7 +44,7 @@ EOL
 
 start_dmenu () {
   input="$(cat "$hist_file" | $selector "Start tracking")"
-  [ -z "$input" ] || read_status && start "$input"
+  [ -z "$input" ] || (read_status && start "$input")
 }
 
 case $1 in
